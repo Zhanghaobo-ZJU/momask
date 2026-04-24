@@ -2,3 +2,8 @@
 checkpoints
 editing
 generation
+dataset/
+dataset_H1/
+glove/
+log/
+notion/
