@@ -96,7 +96,7 @@ class RVQTokenizerTrainer:
         start_time = time.time()
         total_iters = self.opt.max_epoch * len(train_loader)
         print(f'Total Epochs: {self.opt.max_epoch}, Total Iters: {total_iters}')
-        print('Iters Per Epoch, Training: %04d, Validation: %03d' % (len(train_loader), len(eval_val_loader) if eval_val_loader is not None else 0))
+        print('Iters Per Epoch, Training: %04d, Validation: %03d' % (len(train_loader), len(eval_val_loader)))
         # val_loss = 0
         # min_val_loss = np.inf
         # min_val_epoch = epoch
@@ -104,14 +104,11 @@ class RVQTokenizerTrainer:
         logs = defaultdict(def_value, OrderedDict())
 
         # sys.exit()
-        if eval_val_loader is not None:
-            best_fid, best_div, best_top1, best_top2, best_top3, best_matching, writer = evaluation_vqvae(
-                self.opt.model_dir, eval_val_loader, self.vq_model, self.logger, epoch, best_fid=1000,
-                best_div=100, best_top1=0,
-                best_top2=0, best_top3=0, best_matching=100,
-                eval_wrapper=eval_wrapper, save=False)
-        else:
-            best_fid, best_div, best_top1, best_top2, best_top3, best_matching, writer = 1000, 100, 0, 0, 0, 100, None
+        best_fid, best_div, best_top1, best_top2, best_top3, best_matching, writer = evaluation_vqvae(
+            self.opt.model_dir, eval_val_loader, self.vq_model, self.logger, epoch, best_fid=1000,
+            best_div=100, best_top1=0,
+            best_top2=0, best_top3=0, best_matching=100,
+            eval_wrapper=eval_wrapper, save=False)
 
         while epoch < self.opt.max_epoch:
             self.vq_model.train()
@@ -194,13 +191,10 @@ class RVQTokenizerTrainer:
             #     self.save(pjoin(self.opt.model_dir, 'finest.tar'), epoch, it)
             #     print('Best Validation Model So Far!~')
 
-            if eval_val_loader is not None:
-                best_fid, best_div, best_top1, best_top2, best_top3, best_matching, writer = evaluation_vqvae(
-                    self.opt.model_dir, eval_val_loader, self.vq_model, self.logger, epoch, best_fid=best_fid,
-                    best_div=best_div, best_top1=best_top1,
-                    best_top2=best_top2, best_top3=best_top3, best_matching=best_matching, eval_wrapper=eval_wrapper)
-            else:
-                best_fid, best_div, best_top1, best_top2, best_top3, best_matching, writer = 1000, 100, 0, 0, 0, 100, None
+            best_fid, best_div, best_top1, best_top2, best_top3, best_matching, writer = evaluation_vqvae(
+                self.opt.model_dir, eval_val_loader, self.vq_model, self.logger, epoch, best_fid=best_fid,
+                best_div=best_div, best_top1=best_top1,
+                best_top2=best_top2, best_top3=best_top3, best_matching=best_matching, eval_wrapper=eval_wrapper)
 
 
             if epoch % self.opt.eval_every_e == 0:

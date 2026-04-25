@@ -74,7 +74,8 @@ if __name__ == "__main__":
     else:
         raise KeyError('Dataset Does not Exists')
 
-    eval_wrapper = None  # Skip evaluation (no pre-trained evaluator)
+    wrapper_opt = get_opt(dataset_opt_path, torch.device('cuda'))
+    eval_wrapper = EvaluatorModelWrapper(wrapper_opt)
 
     mean = np.load(pjoin(opt.data_root, 'Mean.npy'))
     std = np.load(pjoin(opt.data_root, 'Std.npy'))
@@ -112,7 +113,8 @@ if __name__ == "__main__":
                               shuffle=True, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=opt.batch_size, drop_last=True, num_workers=4,
                             shuffle=True, pin_memory=True)
-    trainer.train(train_loader, val_loader, None, None, None)  # Skip eval_loader and eval_wrapper
+    eval_val_loader, _ = get_dataset_motion_loader(dataset_opt_path, 32, 'val', device=opt.device)
+    trainer.train(train_loader, val_loader, eval_val_loader, eval_wrapper, plot_t2m)
 
 ## train_vq.py --dataset_name kit --batch_size 512 --name VQVAE_dp2 --gpu_id 3
 ## train_vq.py --dataset_name kit --batch_size 256 --name VQVAE_dp2_b256 --gpu_id 2
